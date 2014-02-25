@@ -34,7 +34,7 @@ function modelFromClass(cls) {
   var name = cls.ctor.definition.name;
 
   var required = _(properties).pick(function(p) { return p.required; }).keys().value();
-  var formatted = _(properties).map(formatProperty).merge().value();
+  var formatted = _(properties).map(formatProperty).assign().value();
 
   model[name] = {
     id: name,
