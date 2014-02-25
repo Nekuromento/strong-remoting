@@ -7,6 +7,43 @@ module.exports = Swagger;
  * Module dependencies.
  */
 var Remoting = require('../');
+var _ = require('lodash');
+
+function formatProperty(property, name) {
+  items = {
+    type: _.isArray(property.type) ? prepareDataType(property.type[0]) : 'object'
+  };
+
+  var type = prepareDataType(property.type);
+
+  var formatted = {};
+  formatted[name] = {
+    type: type,
+    required: property.required,
+    items: type == 'array' ? items : undefined
+  };
+  return formatted;
+}
+
+/**
+ * Create a swagger compatible model description from remote object class
+ */
+function modelFromClass(cls) {
+  var model = {};
+  var properties = cls.ctor.definition.properties;
+  var name = cls.ctor.definition.name;
+
+  var required = _(properties).pick(function(p) { return p.required; }).keys().value();
+  var formatted = _(properties).map(formatProperty).merge().value();
+
+  model[name] = {
+    id: name,
+    required: required,
+    properties: formatted
+  };
+
+  return model;
+}
 
 /**
  * Create a remotable Swagger module for plugging into `RemoteObjects`.
@@ -33,6 +70,8 @@ function Swagger(remotes, options, models) {
     basePath: basePath,
     apis: []
   };
+
+  models = models || _(classes).map(modelFromClass).merge().value();
 
   classes.forEach(function (item) {
     resourceDoc.apis.push({
@@ -77,7 +116,7 @@ function Swagger(remotes, options, models) {
       route.accepts = (route.accepts || []).concat(classDef.sharedCtor.accepts);
     }
 
-    doc.apis.push(routeToAPI(route));
+    doc.apis.push(routeToAPI(route, classDef.ctor.definition.name));
   });
 
   /**
@@ -150,15 +189,20 @@ function addDynamicBasePathGetter(remotes, path, obj) {
  * Swagger-formatted "API" description.
  */
 
-function routeToAPI(route) {
+function routeToAPI(route, modelName) {
   var returnDesc = route.returns && route.returns[0];
+  var model = returnDesc
+    ? ((returnDesc.type == 'object' || returnDesc.type == 'any')
+         ? modelName || 'any'
+         : prepareDataType(returnDesc.type))
+    : 'void';
 
   return {
     path: convertPathFragments(route.path),
     operations: [{
       httpMethod: convertVerb(route.verb),
       nickname: route.method.replace(/\./g, '_'), // [rfeng] Swagger UI doesn't escape '.' for jQuery selector
-      responseClass: returnDesc ? returnDesc.model || prepareDataType(returnDesc.type) : 'void',
+      responseClass: model,
       parameters: route.accepts ? route.accepts.map(acceptToParameter(route)) : [],
       errorResponses: [], // TODO(schoon) - We don't have descriptions for this yet.
       summary: route.description, // TODO(schoon) - Excerpt?
@@ -238,11 +282,27 @@ function prepareDataType(type) {
   switch (type) {
     case 'buffer':
       return 'byte';
+    case Date:
     case 'date':
       return 'Date';
+    case Number:
     case 'number':
       return 'double';
+    case String:
+      return 'string';
+    case Array:
+    case 'array':
+      return 'array';
+    case 'any':
+      return 'any';
+    case 'object':
+      return 'object';
   }
 
-  return type;
+  if (Array.isArray(type)) {
+    return 'array';
+  }
+
+  return typeof type  == 'string' ? type : 'object';
 }
+
