@@ -34,7 +34,7 @@ function modelFromClass(cls) {
   var name = cls.ctor.definition.name;
 
   var required = _(properties).pick(function(p) { return p.required; }).keys().value();
-  var formatted = _(properties).map(formatProperty).assign().value();
+  var formatted = _(properties).map(formatProperty).reduce(_.assign, {});
 
   model[name] = {
     id: name,
@@ -71,7 +71,7 @@ function Swagger(remotes, options, models) {
     apis: []
   };
 
-  models = models || _(classes).map(modelFromClass).merge().value();
+  models = models || _(classes).map(modelFromClass).reduce(_.assign, {});
 
   classes.forEach(function (item) {
     resourceDoc.apis.push({
