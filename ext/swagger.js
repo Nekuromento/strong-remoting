@@ -223,7 +223,7 @@ function Swagger(remotes, options, models) {
                  'grant types.</p>' +
                  '<p>For <u>authorization code</u> grant type you can exchange authorization ' +
                  'code received from authorization endpoint for an access token</p>' +
-                 '<p>For <u>resource owner password credentials</u> grant type you exchange user credentials for an access token<p>' +
+                 '<p>For <u>resource owner password credentials</u> grant type you exchange user credentials for an access token</p>' +
                  '<p>Client credentials can be provided either via form arguments or via HTTP Basic authorization</p>'
         }]
       },
