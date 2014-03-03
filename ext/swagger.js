@@ -291,8 +291,6 @@ function Swagger(remotes, options, models) {
   addDynamicBasePathGetter(remotes, name + '.resources', resourceDoc);
 
   helper.method(oauth, {
-    path: '/oauth',
-    http: { path: '/oauth' },
     returns: { type: 'object', root: true }
   });
   function oauth(callback) {
@@ -325,7 +323,7 @@ function Swagger(remotes, options, models) {
  *                                        getter on.
  */
 function addDynamicBasePathGetter(remotes, path, obj) {
-  var initialPath = obj.basePath || '/';
+  var initialPath = obj.basePath || '';
   var basePath = String(obj.basePath) || '';
 
   if (!/^https?:\/\//.test(basePath)) {
