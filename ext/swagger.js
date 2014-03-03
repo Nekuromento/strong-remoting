@@ -219,11 +219,11 @@ function Swagger(remotes, options, models) {
                 "allowMultiple": false
               },
               {
-                "paramType": "query",
+                "paramType": "form",
                 "name": "client_secret",
                 "description": "Client secret",
                 "dataType": "string",
-                "required": true,
+                "required": false,
                 "allowMultiple": false
               },
               {
