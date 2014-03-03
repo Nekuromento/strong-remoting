@@ -188,7 +188,15 @@ function Swagger(remotes, options, models) {
             ],
             errorResponses: [],
             summary: 'OAuth 2.0 authorization endpoint',
-            notes: ''
+            notes: '<p>OAuth 2.0 specifies a framework that allows users to grant client ' +
+                   'applications limited access to their protected resources. It does ' +
+                   'this through a process of the user granting access, and the client ' +
+                   'exchanging the grant for an access token.</p>' +
+                   '<p>We support three grant types: <u>authorization codes</u>, ' +
+                   '<u>implicit</u> and <u>resource owner password credentials</u>.</p>' +
+                   '<p>For detailed description see <a href="http://tools.ietf.org/html/rfc6749#section-1.3">Section 1.3 of OAuth spec</a></p>' +
+                   '<p>This endpoint is used for <u>authorization code</u> and <u>implicit</u> ' +
+                   'grant types.</p>'
           }]
         },
         {
@@ -277,7 +285,8 @@ function Swagger(remotes, options, models) {
             ],
             errorResponses: [],
             summary: 'OAuth 2.0 token endpoint',
-            notes: ''
+            notes: '<p>This endpoint is used for <u>authorization code</u> and <u>password</u> ' +
+                   'grant types.</p>'
           }]
         },
       ],
