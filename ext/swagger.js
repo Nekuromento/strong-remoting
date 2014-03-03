@@ -87,6 +87,150 @@ function Swagger(remotes, options, models) {
     }
   };
 
+  var oauthDoc = {
+    apiVersion: resourceDoc.apiVersion,
+    swaggerVersion: resourceDoc.swaggerVersion,
+    basePath: basePath.replace('/api', ''),
+    apis: [
+      {
+        path: convertPathFragments('/oauth/authorize'),
+        operations: [{
+          httpMethod: "GET",
+          nickname: "oauth_authorize",
+          responseClass: 'void',
+          parameters: [
+            {
+              "paramType": "query",
+              "name": "response_type",
+              "description": "Response type",
+              "dataType": "string",
+              "required": true,
+              "allowMultiple": false,
+              "enum": [
+                "code",
+                "token"
+              ]
+            },
+            {
+              "paramType": "query",
+              "name": "client_id",
+              "description": "Client ID",
+              "dataType": "string",
+              "required": true,
+              "allowMultiple": false
+            },
+            {
+              "paramType": "query",
+              "name": "redirect_uri",
+              "description": "Client redirect URI",
+              "dataType": "string",
+              "required": true,
+              "allowMultiple": false
+            }
+          ],
+          errorResponses: [],
+          summary: 'OAuth 2.0 authorization endpoint',
+          notes: '<p>OAuth 2.0 specifies a framework that allows users to grant client ' +
+                 'applications limited access to their protected resources. It does ' +
+                 'this through a process of the user granting access, and the client ' +
+                 'exchanging the grant for an access token.</p>' +
+                 '<p>We support three grant types: <u>authorization codes</u>, ' +
+                 '<u>implicit</u> and <u>resource owner password credentials</u>.</p>' +
+                 '<p>For detailed description see <a href="http://tools.ietf.org/html/rfc6749#section-1.3">Section 1.3 of OAuth spec</a></p>' +
+                 '<p>This endpoint is used for <u>authorization code</u> and <u>implicit</u> ' +
+                 'grant types.</p>'
+        }]
+      },
+      {
+        path: convertPathFragments('/oauth/token'),
+        operations: [{
+          httpMethod: "POST",
+          nickname: "oauth_token",
+          responseClass: 'token',
+          parameters: [
+            {
+              "paramType": "form",
+              "name": "grant_type",
+              "description": "Token grant type",
+              "dataType": "string",
+              "required": true,
+              "allowMultiple": false,
+              "enum": [
+                "authorization_code",
+                "password"
+              ]
+            },
+            {
+              "paramType": "form",
+              "name": "client_id",
+              "description": "Client ID",
+              "dataType": "string",
+              "required": true,
+              "allowMultiple": false
+            },
+            {
+              "paramType": "form",
+              "name": "client_secret",
+              "description": "Client secret",
+              "dataType": "string",
+              "required": true,
+              "allowMultiple": false
+            },
+            {
+              "paramType": "form",
+              "name": "redirect_uri",
+              "description": "Client redirect URI",
+              "dataType": "string",
+              "required": false,
+              "allowMultiple": false
+            },
+            {
+              "paramType": "form",
+              "name": "username",
+              "description": "User login",
+              "dataType": "string",
+              "required": false,
+              "allowMultiple": false
+            },
+            {
+              "paramType": "form",
+              "name": "password",
+              "description": "User password",
+              "dataType": "string",
+              "required": false,
+              "allowMultiple": false
+            },
+            {
+              "paramType": "form",
+              "name": "code",
+              "description": "Authorization code",
+              "dataType": "string",
+              "required": false,
+              "allowMultiple": false
+            },
+            {
+              "paramType": "form",
+              "name": "scope",
+              "description": "Scope of access",
+              "dataType": "string",
+              "required": false,
+              "allowMultiple": false
+            }
+          ],
+          errorResponses: [],
+          summary: 'OAuth 2.0 token endpoint',
+          notes: '<p>This endpoint is used for <u>authorization code</u> and <u>password</u> ' +
+                 'grant types.</p>' +
+                 '<p>For <u>authorization code</u> grant type you can exchange authorization ' +
+                 'code received from authorization endpoint for an access token</p>' +
+                 '<p>For <u>resource owner password credentials</u> grant type you exchange user credentials for an access token<p>' +
+                 '<p>Client credentials can be provided either via form arguments or via HTTP Basic authorization</p>'
+        }]
+      },
+    ],
+    models: models
+  };
+
   classes.forEach(function (item) {
     resourceDoc.apis.push({
       path: '/' + name + item.http.path,
@@ -144,161 +288,18 @@ function Swagger(remotes, options, models) {
     callback(null, resourceDoc);
   }
 
-  helper.method(function(callback) {
-    callback(null, {
-      apiVersion: resourceDoc.apiVersion,
-      swaggerVersion: resourceDoc.swaggerVersion,
-      basePath: 'http://127.0.0.1:3000',
-      apis: [
-        {
-          path: convertPathFragments('/oauth/authorize'),
-          operations: [{
-            httpMethod: "GET",
-            nickname: "oauth_authorize",
-            responseClass: 'void',
-            parameters: [
-              {
-                "paramType": "query",
-                "name": "response_type",
-                "description": "Response type",
-                "dataType": "string",
-                "required": true,
-                "allowMultiple": false,
-                "enum": [
-                  "code",
-                  "token"
-                ]
-              },
-              {
-                "paramType": "query",
-                "name": "client_id",
-                "description": "Client ID",
-                "dataType": "string",
-                "required": true,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "query",
-                "name": "redirect_uri",
-                "description": "Client redirect URI",
-                "dataType": "string",
-                "required": true,
-                "allowMultiple": false
-              }
-            ],
-            errorResponses: [],
-            summary: 'OAuth 2.0 authorization endpoint',
-            notes: '<p>OAuth 2.0 specifies a framework that allows users to grant client ' +
-                   'applications limited access to their protected resources. It does ' +
-                   'this through a process of the user granting access, and the client ' +
-                   'exchanging the grant for an access token.</p>' +
-                   '<p>We support three grant types: <u>authorization codes</u>, ' +
-                   '<u>implicit</u> and <u>resource owner password credentials</u>.</p>' +
-                   '<p>For detailed description see <a href="http://tools.ietf.org/html/rfc6749#section-1.3">Section 1.3 of OAuth spec</a></p>' +
-                   '<p>This endpoint is used for <u>authorization code</u> and <u>implicit</u> ' +
-                   'grant types.</p>'
-          }]
-        },
-        {
-          path: convertPathFragments('/oauth/token'),
-          operations: [{
-            httpMethod: "POST",
-            nickname: "oauth_token",
-            responseClass: 'token',
-            parameters: [
-              {
-                "paramType": "form",
-                "name": "grant_type",
-                "description": "Token grant type",
-                "dataType": "string",
-                "required": true,
-                "allowMultiple": false,
-                "enum": [
-                  "authorization_code",
-                  "password"
-                ]
-              },
-              {
-                "paramType": "form",
-                "name": "client_id",
-                "description": "Client ID",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "form",
-                "name": "redirect_uri",
-                "description": "Client redirect URI",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "form",
-                "name": "client_secret",
-                "description": "Client secret",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "form",
-                "name": "username",
-                "description": "User login",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "form",
-                "name": "password",
-                "description": "User password",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "form",
-                "name": "code",
-                "description": "Authorization code",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "form",
-                "name": "scope",
-                "description": "Scope of access",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "header",
-                "name": "Authorization",
-                "description": "Http Basic authorization header (client-id:client-secret)",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              }
-            ],
-            errorResponses: [],
-            summary: 'OAuth 2.0 token endpoint',
-            notes: '<p>This endpoint is used for <u>authorization code</u> and <u>password</u> ' +
-                   'grant types.</p>'
-          }]
-        },
-      ],
-      models: models
-    });
-  }, {
+  addDynamicBasePathGetter(remotes, name + '.resources', resourceDoc);
+
+  helper.method(oauth, {
     path: '/oauth',
     http: { path: '/oauth' },
     returns: { type: 'object', root: true }
   });
+  function oauth(callback) {
+    callback(null, oauthDoc);
+  }
 
-  addDynamicBasePathGetter(remotes, name + '.resources', resourceDoc);
+  addDynamicBasePathGetter(remotes, name + '.oauth', oauthDoc);
 
   remotes.exports[name] = extension;
   return extension;
