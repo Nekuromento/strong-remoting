@@ -90,7 +90,7 @@ function Swagger(remotes, options, models) {
   var oauthDoc = {
     apiVersion: resourceDoc.apiVersion,
     swaggerVersion: resourceDoc.swaggerVersion,
-    basePath: basePath.replace('/api', ''),
+    basePath: '',
     apis: [
       {
         path: convertPathFragments('/oauth/authorize'),
