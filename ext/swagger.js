@@ -74,12 +74,15 @@ function Swagger(remotes, options, models) {
   models = models || _(classes).map(modelFromClass).reduce(_.assign, {});
   models['token'] = {
     id: 'token',
+    required: ['access_token', 'token_type'],
     properties: {
       "access_token": {
-        "type": 'string'
+        "type": 'string',
+        "required": true
       },
       "token_type": {
-        "type": 'string'
+        "type": 'string',
+        "required": true
       }
     }
   };
@@ -176,14 +179,6 @@ function Swagger(remotes, options, models) {
               },
               {
                 "paramType": "query",
-                "name": "client_secret",
-                "description": "Client secret",
-                "dataType": "string",
-                "required": true,
-                "allowMultiple": false
-              },
-              {
-                "paramType": "query",
                 "name": "redirect_uri",
                 "description": "Client redirect URI",
                 "dataType": "string",
@@ -221,6 +216,14 @@ function Swagger(remotes, options, models) {
                 "description": "Client ID",
                 "dataType": "string",
                 "required": false,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "query",
+                "name": "client_secret",
+                "description": "Client secret",
+                "dataType": "string",
+                "required": true,
                 "allowMultiple": false
               },
               {
