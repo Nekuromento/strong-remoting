@@ -68,24 +68,31 @@ function Swagger(remotes, options, models) {
     apiVersion: version,
     swaggerVersion: '1.2',
     basePath: basePath,
-    apis: [{ path: "/swagger/oauth" }],
+    apis: [
+      {
+        path: '/swagger/oauth'
+      },
+      {
+        path: '/swagger/batch'
+      }
+    ],
     authorizations: {
-      "oauth2": {
-        "grantTypes": {
-          "implicit": {
-            "loginEndpoint": {
-              "url": "/oauth/authorize"
+      oauth2: {
+        grantTypes: {
+          implicit: {
+            loginEndpoint: {
+              url: '/oauth/authorize'
             },
-            "tokenName": "access_token"
+            tokenName: 'access_token'
           }
         },
-        "scopes": [
+        scopes: [
           {
-            "description": "Allow everything",
-            "scope": "*"
+            description: 'Allow everything',
+            scope: '*'
           },
         ],
-        "type": "oauth2"
+        type: 'oauth2'
       }
     }
   };
@@ -95,13 +102,13 @@ function Swagger(remotes, options, models) {
     id: 'token',
     required: ['access_token', 'token_type'],
     properties: {
-      "access_token": {
-        "type": 'string',
-        "required": true
+      access_token: {
+        type: 'string',
+        required: true
       },
-      "token_type": {
-        "type": 'string',
-        "required": true
+      token_type: {
+        type: 'string',
+        required: true
       }
     }
   };
@@ -114,37 +121,37 @@ function Swagger(remotes, options, models) {
       {
         path: convertPathFragments('/oauth/authorize'),
         operations: [{
-          httpMethod: "GET",
-          nickname: "oauth_authorize",
+          httpMethod: 'GET',
+          nickname: 'oauth_authorize',
           responseClass: 'void',
           parameters: [
             {
-              "paramType": "query",
-              "name": "response_type",
-              "description": "Response type",
-              "dataType": "string",
-              "required": true,
-              "allowMultiple": false,
-              "enum": [
-                "code",
-                "token"
+              paramType: 'query',
+              name: 'response_type',
+              description: 'Response type',
+              dataType: 'string',
+              required: true,
+              allowMultiple: false,
+              enum: [
+                'code',
+                'token'
               ]
             },
             {
-              "paramType": "query",
-              "name": "client_id",
-              "description": "Client ID",
-              "dataType": "string",
-              "required": true,
-              "allowMultiple": false
+              paramType: 'query',
+              name: 'client_id',
+              description: 'Client ID',
+              dataType: 'string',
+              required: true,
+              allowMultiple: false
             },
             {
-              "paramType": "query",
-              "name": "redirect_uri",
-              "description": "Client redirect URI",
-              "dataType": "string",
-              "required": true,
-              "allowMultiple": false
+              paramType: 'query',
+              name: 'redirect_uri',
+              description: 'Client redirect URI',
+              dataType: 'string',
+              required: true,
+              allowMultiple: false
             }
           ],
           errorResponses: [],
@@ -163,18 +170,18 @@ function Swagger(remotes, options, models) {
       {
         path: convertPathFragments('/oauth/token'),
         operations: [{
-          httpMethod: "POST",
-          nickname: "oauth_token",
+          httpMethod: 'POST',
+          nickname: 'oauth_token',
           responseClass: 'token',
           parameters: [
             {
-              "paramType": "form",
-              "name": "grant_type",
-              "description": "Token grant type",
-              "dataType": "string",
-              "required": true,
-              "allowMultiple": false,
-              "enum": [
+              paramType: "form",
+              nam: "grant_type",
+              description: "Token grant type",
+              dataType: "string",
+              required: true,
+              allowMultiple: false,
+              enum: [
                 "authorization_code",
                 "password"
               ]
@@ -250,6 +257,43 @@ function Swagger(remotes, options, models) {
     models: models
   };
 
+  var batchDoc = {
+    apiVersion: resourceDoc.apiVersion,
+    swaggerVersion: resourceDoc.swaggerVersion,
+    basePath: '',
+    apis: [
+      {
+        path: convertPathFragments('/batch'),
+        operations: [{
+          httpMethod: "POST",
+          nickname: "batch",
+          responseClass: 'object',
+          parameters: [
+            {
+              paramType: 'body',
+              name: 'data',
+              description: 'Batch request object',
+              dataType: 'object',
+              required: true,
+              allowMultiple: false,
+            },
+          ],
+          errorResponses: [],
+          summary: 'Batch request',
+          notes: '',
+          authorizations: {
+            oauth2: [
+              {
+                description: 'Allow everything',
+                scope: '*'
+              }
+            ]
+          }
+        }]
+      },
+    ],
+  };
+
   classes.forEach(function (item) {
     resourceDoc.apis.push({
       path: '/' + name + item.http.path,
@@ -317,6 +361,15 @@ function Swagger(remotes, options, models) {
   }
 
   addDynamicBasePathGetter(remotes, name + '.oauth', oauthDoc);
+
+  helper.method(batch, {
+    returns: { type: 'object', root: true }
+  });
+  function batch(callback) {
+    callback(null, batchDoc);
+  }
+
+  addDynamicBasePathGetter(remotes, name + '.batch', batchDoc);
 
   remotes.exports[name] = extension;
   return extension;
@@ -394,11 +447,11 @@ function routeToAPI(route, modelName) {
       errorResponses: [], // TODO(schoon) - We don't have descriptions for this yet.
       summary: route.description, // TODO(schoon) - Excerpt?
       notes: '', // TODO(schoon) - `description` metadata?
-      "authorizations": {
-        "oauth2": [
+      authorizations: {
+        oauth2: [
           {
-            "description": "Allow everything",
-            "scope": "*"
+            description: 'Allow everything',
+            scope: '*'
           }
         ]
       }
