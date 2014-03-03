@@ -66,9 +66,9 @@ function Swagger(remotes, options, models) {
   var apiDocs = {};
   var resourceDoc = {
     apiVersion: version,
-    swaggerVersion: '1.1',
+    swaggerVersion: '1.2',
     basePath: basePath,
-    apis: []
+    apis: [{ path: "/swagger/oauth" }]
   };
 
   models = models || _(classes).map(modelFromClass).reduce(_.assign, {});
@@ -92,6 +92,7 @@ function Swagger(remotes, options, models) {
       http: { path: item.http.path },
       returns: { type: 'object', root: true }
     });
+    console.log(item)
     function api(callback) {
       callback(null, apiDocs[item.name]);
     }
@@ -129,6 +130,136 @@ function Swagger(remotes, options, models) {
   function resources(callback) {
     callback(null, resourceDoc);
   }
+
+  helper.method(function(callback) {
+    callback(null, {
+      apiVersion: resourceDoc.apiVersion,
+      swaggerVersion: resourceDoc.swaggerVersion,
+      basePath: 'http://127.0.0.1:3000',
+      apis: [
+        {
+          path: convertPathFragments('/oauth/authorize'),
+          operations: [{
+            httpMethod: "GET",
+            nickname: "oauth_authorize",
+            responseClass: 'object',
+            parameters: [
+              {
+                "paramType": "query",
+                "name": "response_type",
+                "description": "Response type",
+                "dataType": "string",
+                "required": true,
+                "allowMultiple": false,
+                "enum": [
+                  "code",
+                  "token"
+                ]
+              },
+              {
+                "paramType": "query",
+                "name": "client_id",
+                "description": "Client ID",
+                "dataType": "string",
+                "required": true,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "query",
+                "name": "client_secret",
+                "description": "Client secret",
+                "dataType": "string",
+                "required": true,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "query",
+                "name": "redirect_uri",
+                "description": "Client redirect URI",
+                "dataType": "string",
+                "required": true,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "header",
+                "name": "Authorization",
+                "description": "Http Basic authorization header: 'Basic ' + Base64-encoded(client-id + ':' + client-secret)",
+                "dataType": "string",
+                "required": false,
+                "allowMultiple": false
+              },
+            ],
+            errorResponses: [],
+            summary: 'OAuth 2.0 authorization endpoint.\nFor details see http://tools.ietf.org/html/rfc6749#section-4.1 for Authorization Code Grant, http://tools.ietf.org/html/rfc6749#section-4.2 for Implicit Grant',
+            notes: ''
+          }]
+        },
+        {
+          path: convertPathFragments('/oauth/token'),
+          operations: [{
+            httpMethod: "POST",
+            nickname: "oauth_token",
+            responseClass: 'object',
+            parameters: [
+              {
+                "paramType": "form",
+                "name": "grant_type",
+                "description": "Token grant type",
+                "dataType": "string",
+                "required": true,
+                "allowMultiple": false,
+                "enum": [
+                  "authorization_code",
+                  "password"
+                ]
+              },
+              {
+                "paramType": "form",
+                "name": "client_id",
+                "description": "Client ID",
+                "dataType": "string",
+                "required": false,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "form",
+                "name": "redirect_uri",
+                "description": "Client redirect URI",
+                "dataType": "string",
+                "required": false,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "form",
+                "name": "code",
+                "description": "Authorization code",
+                "dataType": "string",
+                "required": false,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "form",
+                "name": "scope",
+                "description": "Scope of access",
+                "dataType": "string",
+                "required": false,
+                "allowMultiple": false
+              }
+            ],
+            errorResponses: [],
+            summary: 'OAuth 2.0 token endpoint.\nFor details see http://tools.ietf.org/html/rfc6749#section-4.1.3 for Authorization Code Grant, http://tools.ietf.org/html/rfc6749#section-4.3 for Resource Owner Password Credentials Grant',
+            notes: ''
+          }]
+        },
+      ],
+      models: models
+    });
+  }, {
+    path: '/oauth',
+    http: { path: '/oauth' },
+    returns: { type: 'object', root: true }
+  });
+
   addDynamicBasePathGetter(remotes, name + '.resources', resourceDoc);
 
   remotes.exports[name] = extension;
