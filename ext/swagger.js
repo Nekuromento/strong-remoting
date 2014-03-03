@@ -220,6 +220,14 @@ function Swagger(remotes, options, models) {
               },
               {
                 "paramType": "form",
+                "name": "redirect_uri",
+                "description": "Client redirect URI",
+                "dataType": "string",
+                "required": false,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "form",
                 "name": "client_secret",
                 "description": "Client secret",
                 "dataType": "string",
@@ -228,8 +236,16 @@ function Swagger(remotes, options, models) {
               },
               {
                 "paramType": "form",
-                "name": "redirect_uri",
-                "description": "Client redirect URI",
+                "name": "username",
+                "description": "User login",
+                "dataType": "string",
+                "required": false,
+                "allowMultiple": false
+              },
+              {
+                "paramType": "form",
+                "name": "password",
+                "description": "User password",
                 "dataType": "string",
                 "required": false,
                 "allowMultiple": false
