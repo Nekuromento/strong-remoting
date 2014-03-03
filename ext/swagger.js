@@ -68,7 +68,26 @@ function Swagger(remotes, options, models) {
     apiVersion: version,
     swaggerVersion: '1.2',
     basePath: basePath,
-    apis: [{ path: "/swagger/oauth" }]
+    apis: [{ path: "/swagger/oauth" }],
+    authorizations: {
+      "oauth2": {
+        "grantTypes": {
+          "implicit": {
+            "loginEndpoint": {
+              "url": "/oauth/authorize"
+            },
+            "tokenName": "access_token"
+          }
+        },
+        "scopes": [
+          {
+            "description": "Allow everything",
+            "scope": "*"
+          },
+        ],
+        "type": "oauth2"
+      }
+    }
   };
 
   models = models || _(classes).map(modelFromClass).reduce(_.assign, {});
@@ -374,7 +393,15 @@ function routeToAPI(route, modelName) {
       parameters: route.accepts ? route.accepts.map(acceptToParameter(route)) : [],
       errorResponses: [], // TODO(schoon) - We don't have descriptions for this yet.
       summary: route.description, // TODO(schoon) - Excerpt?
-      notes: '' // TODO(schoon) - `description` metadata?
+      notes: '', // TODO(schoon) - `description` metadata?
+      "authorizations": {
+        "oauth2": [
+          {
+            "description": "Allow everything",
+            "scope": "*"
+          }
+        ]
+      }
     }]
   };
 }
