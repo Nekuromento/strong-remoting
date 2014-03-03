@@ -72,6 +72,17 @@ function Swagger(remotes, options, models) {
   };
 
   models = models || _(classes).map(modelFromClass).reduce(_.assign, {});
+  models['token'] = {
+    id: 'token',
+    properties: {
+      "access_token": {
+        "type": 'string'
+      },
+      "token_type": {
+        "type": 'string'
+      }
+    }
+  };
 
   classes.forEach(function (item) {
     resourceDoc.apis.push({
@@ -92,7 +103,6 @@ function Swagger(remotes, options, models) {
       http: { path: item.http.path },
       returns: { type: 'object', root: true }
     });
-    console.log(item)
     function api(callback) {
       callback(null, apiDocs[item.name]);
     }
@@ -142,7 +152,7 @@ function Swagger(remotes, options, models) {
           operations: [{
             httpMethod: "GET",
             nickname: "oauth_authorize",
-            responseClass: 'object',
+            responseClass: 'void',
             parameters: [
               {
                 "paramType": "query",
@@ -179,18 +189,10 @@ function Swagger(remotes, options, models) {
                 "dataType": "string",
                 "required": true,
                 "allowMultiple": false
-              },
-              {
-                "paramType": "header",
-                "name": "Authorization",
-                "description": "Http Basic authorization header: 'Basic ' + Base64-encoded(client-id + ':' + client-secret)",
-                "dataType": "string",
-                "required": false,
-                "allowMultiple": false
-              },
+              }
             ],
             errorResponses: [],
-            summary: 'OAuth 2.0 authorization endpoint.\nFor details see http://tools.ietf.org/html/rfc6749#section-4.1 for Authorization Code Grant, http://tools.ietf.org/html/rfc6749#section-4.2 for Implicit Grant',
+            summary: 'OAuth 2.0 authorization endpoint',
             notes: ''
           }]
         },
@@ -199,7 +201,7 @@ function Swagger(remotes, options, models) {
           operations: [{
             httpMethod: "POST",
             nickname: "oauth_token",
-            responseClass: 'object',
+            responseClass: 'token',
             parameters: [
               {
                 "paramType": "form",
@@ -244,10 +246,18 @@ function Swagger(remotes, options, models) {
                 "dataType": "string",
                 "required": false,
                 "allowMultiple": false
+              },
+              {
+                "paramType": "header",
+                "name": "Authorization",
+                "description": "Http Basic authorization header (client-id:client-secret)",
+                "dataType": "string",
+                "required": false,
+                "allowMultiple": false
               }
             ],
             errorResponses: [],
-            summary: 'OAuth 2.0 token endpoint.\nFor details see http://tools.ietf.org/html/rfc6749#section-4.1.3 for Authorization Code Grant, http://tools.ietf.org/html/rfc6749#section-4.3 for Resource Owner Password Credentials Grant',
+            summary: 'OAuth 2.0 token endpoint',
             notes: ''
           }]
         },
