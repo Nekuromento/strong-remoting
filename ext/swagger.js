@@ -302,7 +302,7 @@ function Swagger(remotes, options, models) {
                  '<p>If the token has expired, has been tampered with, or the permissions ' +
                  'revoked, server will respond with an error. The error surfaces as a 400 ' +
                  'status code, and a JSON body as follows:</p>' +
-                 '<pre>{\n  "error":"invalid_token"\n}</pre>' +
+                 '<pre>{\n  "error": "invalid_token"\n}</pre>' +
                  '<p>By design, no additional information is given as to the reason for the failure.</p>'
         }]
       },
