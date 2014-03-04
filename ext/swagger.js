@@ -296,8 +296,14 @@ function Swagger(remotes, options, models) {
           notes: '<p>Tokens received on the fragment <u>MUST</u> be explicitly validated. ' +
                  'Failure to verify tokens acquired this way makes your application more ' +
                  'vulnerable to the <a href="http://en.wikipedia.org/wiki/Confused_deputy_problem">confused deputy problem</a>.</p>' +
+                 '<p>When verifying a token, it is critical to ensure the audience field ' +
+                 'in the response exactly matches your client ID. It is absolutely vital ' +
+                 'to perform this step, because it is the mitigation for the confused deputy issue.</p>' +
                  '<p>If the token has expired, has been tampered with, or the permissions ' +
-                 'revoked, server will respond with an error. The error surfaces as a 400 status code</p>'
+                 'revoked, server will respond with an error. The error surfaces as a 400 ' +
+                 'status code, and a JSON body as follows:</p>' +
+                 '<pre>{\n  "error":"invalid_token"\n}</pre>' +
+                 '<p>By design, no additional information is given as to the reason for the failure.</p>'
         }]
       },
     ],
