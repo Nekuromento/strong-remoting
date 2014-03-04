@@ -112,6 +112,27 @@ function Swagger(remotes, options, models) {
       }
     }
   };
+  models['tokeninfo'] = {
+    id: 'tokeninfo',
+    required: ['audience', 'user_id', 'scope'],
+    properties: {
+      audience: {
+        type: 'string',
+        required: true
+      },
+      user_id: {
+        type: 'string',
+        required: true
+      },
+      scope: {
+        type: 'string',
+        required: true
+      },
+      expires_in: {
+        type: 'string'
+      }
+    }
+  };
 
   var oauthDoc = {
     apiVersion: resourceDoc.apiVersion,
@@ -254,6 +275,29 @@ function Swagger(remotes, options, models) {
                  'code received from authorization endpoint for an access token</p>' +
                  '<p>For <u>resource owner password credentials</u> grant type you exchange user credentials for an access token</p>' +
                  '<p>Client credentials can be provided either via form arguments or via HTTP Basic authorization</p>'
+        }]
+      },
+      {
+        path: convertPathFragments('/oauth/token/info'),
+        operations: [{
+          httpMethod: 'GET',
+          nickname: 'oauth_tokeninfo',
+          responseClass: 'tokeninfo',
+          parameters: [{
+            paramType: 'query',
+            name: 'access_token',
+            description: 'Access token',
+            dataType: 'string',
+            required: true,
+            allowMultiple: false
+          }],
+          errorResponses: [],
+          summary: 'OAuth 2.0 token validation endpoint',
+          notes: '<p>Tokens received on the fragment <u>MUST</u> be explicitly validated. ' +
+                 'Failure to verify tokens acquired this way makes your application more ' +
+                 'vulnerable to the <a href="http://en.wikipedia.org/wiki/Confused_deputy_problem">confused deputy problem</a>.</p>' +
+                 '<p>If the token has expired, has been tampered with, or the permissions ' +
+                 'revoked, server will respond with an error. The error surfaces as a 400 status code</p>'
         }]
       },
     ],
