@@ -164,7 +164,10 @@ function Swagger(remotes, options, models) {
                  '<u>implicit</u> and <u>resource owner password credentials</u>.</p>' +
                  '<p>For detailed description see <a href="http://tools.ietf.org/html/rfc6749#section-1.3">Section 1.3 of OAuth spec</a></p>' +
                  '<p>This endpoint is used for <u>authorization code</u> and <u>implicit</u> ' +
-                 'grant types.</p>'
+                 'grant types.</p>' +
+                 '<p>Once you receive your token, you can use it to send requests that ' +
+                 'need authorization by adding received token to \'Athorization\' header:</p>' +
+                 '<pre>Authorization: Bearer your-token-goes-here</pre>'
         }]
       },
       {
@@ -268,6 +271,14 @@ function Swagger(remotes, options, models) {
           httpMethod: "POST",
           nickname: "batch",
           responseClass: 'object',
+          authorizations: {
+            oauth2: [
+              {
+                description: 'Allow everything',
+                scope: '*'
+              }
+            ]
+          },
           parameters: [
             {
               paramType: 'body',
@@ -280,15 +291,41 @@ function Swagger(remotes, options, models) {
           ],
           errorResponses: [],
           summary: 'Batch request',
-          notes: '',
-          authorizations: {
-            oauth2: [
-              {
-                description: 'Allow everything',
-                scope: '*'
-              }
-            ]
-          }
+          notes: '<p>Batch requests add the ability for a client to send a single request ' +
+                 'that represents many, have them all run, then return a single response.</p>' +
+                 '<p>Basic batch request will look like this:</p>' +
+                 '<pre>{\n' +
+                 '  "myRequest": {\n' +
+                 '    "method": "GET"\n' +
+                 '    "uri": "/api/users"\n' +
+                 '  }\n' +
+                 '}</pre>' +
+                 '<p>Server will perform a GET request to a local endpoint called ' +
+                 '/api/users/ and will return the result that looks like the following:</p>' +
+                 '<pre>{\n' +
+                 '  "myRequest": {\n' +
+                 '    "statusCode": 200,\n' +
+                 '    "body": ...,\n' +
+                 '    "headers": {\n' +
+                 '      "x-powered-by": "LoopBack",\n' +
+                 '      "content-type": "application/json",\n' +
+                 '      "date": "Wed, 06 Nov 2013 21:33:18 GMT",\n' +
+                 '      "connection": "close",\n' +
+                 '      "transfer-encoding": "chunked"\n' +
+                 '    },\n' +
+                 '  }\n' +
+                 '}</pre>' +
+                 '<p>To add more than one request, just add more keys to the root level ' +
+                 'JSON object, one per additional request:</p>' +
+                 '<pre>{\n' +
+                 '  "myRequest1": ...,\n' +
+                 '  "myRequest2": ...,\n' +
+                 '  "myRequest3": ...\n' +
+                 '}</pre>' +
+                 '<p>To send a request using a particular method (GET, DELETE, PATCH, POST, PUT) specify it with a key of <u>method</u>.</p>' +
+                 '<p>In order to do a POST (or PUT or PATCH) you’ll need to send along the data.</p>' +
+                 '<p>This is as simple as adding a key of <u>body</u> whose value is the data you’d like to POST.</p>' +
+                 '<p>To specify headers to send with a particular request, simply add a key of <u>headers</u> and an object with any headers to send along.</p>'
         }]
       },
     ],
