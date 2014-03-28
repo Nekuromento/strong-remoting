@@ -200,7 +200,7 @@ function Swagger(remotes, options, models) {
           parameters: [
             {
               paramType: "form",
-              nam: "grant_type",
+              name: "grant_type",
               description: "Token grant type",
               dataType: "string",
               required: true,
